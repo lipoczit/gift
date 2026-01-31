@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>30. szülinapi meglepetés — Csak Neked</title>
+  <title>49. szülinapi meglepetés — Csak Neked</title>
   <style>
     :root {
       --bg: #0f0715;
@@ -68,6 +68,7 @@
       perspective: 800px;
       cursor: pointer;
       margin: 0 auto;
+      outline: none;
     }
     .box-base {
       width: 100%;
@@ -85,6 +86,7 @@
       transition: transform 800ms cubic-bezier(.2,.9,.3,1);
       backface-visibility: hidden;
       border: 2px solid rgba(255,255,255,0.15);
+      user-select: none;
     }
     .box-lid {
       width: 110%;
@@ -98,6 +100,7 @@
       transition: transform 700ms cubic-bezier(.2,.9,.3,1);
       box-shadow: 0 10px 22px rgba(0,0,0,0.25);
       border: 2px solid rgba(255,255,255,0.15);
+      user-select: none;
     }
     .box.open .box-lid {
       transform: rotateX(-78deg) translateY(-8px);
@@ -181,14 +184,14 @@
   <div class="wrap">
     <div class="stage">
       <div class="card" role="main" aria-labelledby="title">
-        <h1 id="title">30. szülinapi meglepetés</h1>
+        <h1 id="title">49. szülinapi meglepetés</h1>
         <p class="lead">
-          Olyan vagy, mintha 30 helyett 49 lennél…<br>
+          Olyan vagy, mintha 49 helyett 30 lennél…<br>
           De ma én vagyok a győztes – és Neked adom a fődíjat.
         </p>
 
         <div class="box-wrap">
-          <div id="box" class="box" role="button" tabindex="0" aria-pressed="false" aria-label="Kattints a dobozra a meglepetéshez">
+          <div id="box" class="box" role="button" tabindex="0" aria-pressed="false" aria-label="Kattints a dobozra a meglepetéshez" aria-expanded="false">
             <div class="box-lid" aria-hidden="true"></div>
             <div class="box-base" aria-hidden="true">
               <div style="font-size:2.4rem;color:#fff;font-weight:700;">🎁</div>
@@ -203,7 +206,7 @@
 
           <div class="voucher" id="voucher">
             <div style="font-size:1.3rem;color:var(--accent-light);margin-bottom:.4rem;">
-              30 000 Ft
+              49 000 Ft
             </div>
             <div>
               <strong>Triumph vásárlási utalvány</strong>
@@ -243,11 +246,18 @@
     const YT_ID = 'ioE_O7Lm0I4'; // Bill Conti – Gonna Fly Now
 
     // Load YouTube IFrame API
-    let tag = document.createElement('script');
-    tag.src = "https://www.youtube.com/iframe_api";
-    document.head.appendChild(tag);
+    (function loadYouTubeAPI(){
+      if (!document.querySelector('script[src="https://www.youtube.com/iframe_api"]')) {
+        const tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        document.head.appendChild(tag);
+      }
+    })();
 
     let player;
+    let playerReady = false;
+
+    // This must be global so the API can call it
     function onYouTubeIframeAPIReady() {
       player = new YT.Player('player', {
         height: '0',
@@ -261,14 +271,12 @@
           'playsinline': 1
         },
         events: {
-          'onReady': onPlayerReady
+          'onReady': function() { playerReady = true; },
+          'onStateChange': function() { /* noop for now */ }
         }
       });
     }
-
-    function onPlayerReady(event) {
-      // player ready; we'll start on user click
-    }
+    window.onYouTubeIframeAPIReady = onYouTubeIframeAPIReady;
 
     (function(){
       const box = document.getElementById('box');
@@ -277,21 +285,33 @@
       const revealAgain = document.getElementById('revealAgain');
       const openYT = document.getElementById('openYT');
 
+      // open box visually and try to play video
       function openBox() {
-        if (box.classList.contains('open')) return;
-        box.classList.add('open');
-        box.setAttribute('aria-pressed','true');
+        if (!box.classList.contains('open')) {
+          box.classList.add('open');
+          box.setAttribute('aria-pressed','true');
+          box.setAttribute('aria-expanded','true');
+          msg.style.pointerEvents = 'auto';
 
-        // show message (CSS handles)
-        msg.style.pointerEvents = 'auto';
+          // Try to play via API if ready
+          if (playerReady && player && typeof player.playVideo === 'function') {
+            try {
+              player.seekTo(0);
+              player.playVideo();
+              return;
+            } catch (err) {
+              console.warn('YT play failed (API):', err);
+            }
+          }
 
-        // Play YouTube via API if available (user gesture from click should allow it)
-        if (typeof player !== 'undefined' && player && player.playVideo) {
+          // If player not ready or play failed, open YouTube in new tab as fallback
+          // but only open fallback if the user explicitly clicked (not when keyboard used to focus)
+          // We'll attempt to open a small named window (browsers may block popups if not direct user gesture).
           try {
-            player.playVideo();
+            const win = window.open('https://www.youtube.com/watch?v=' + YT_ID, '_blank', 'noopener');
+            if (win) win.focus();
           } catch (err) {
-            // fall back: open YT in new tab if play fails
-            console.warn('YT play failed:', err);
+            // silent
           }
         }
       }
@@ -299,35 +319,85 @@
       function resetBox(){
         box.classList.remove('open');
         box.setAttribute('aria-pressed','false');
+        box.setAttribute('aria-expanded','false');
       }
 
-      box.addEventListener('click', openBox);
+      // toggle behavior so second click can also close if desired (optional)
+      function toggleBox() {
+        if (box.classList.contains('open')) {
+          // keep open on second click by default — but animation / UX: we re-open music
+          // here we just replay the music
+          if (playerReady && player && typeof player.playVideo === 'function') {
+            try {
+              player.seekTo(0);
+              player.playVideo();
+            } catch(err){}
+          } else {
+            try {
+              const win = window.open('https://www.youtube.com/watch?v=' + YT_ID, '_blank', 'noopener');
+              if (win) win.focus();
+            } catch (err) {}
+          }
+        } else {
+          openBox();
+        }
+      }
+
+      // Click and keyboard support
+      box.addEventListener('click', function (e) {
+        e.preventDefault();
+        toggleBox();
+      }, false);
+
       box.addEventListener('keydown', function(e){
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
-          openBox();
+          toggleBox();
+        } else if (e.key === 'Escape') {
+          resetBox();
         }
       });
+
+      // Support touchstart as explicit user gesture on some mobile browsers
+      box.addEventListener('touchstart', function(e){
+        // don't preventDefault so click still fires on some devices; just ensure the gesture is noticed
+      }, {passive: true});
 
       revealAgain.addEventListener('click', function(e){
         e.preventDefault();
         if (box.classList.contains('open')) {
-          voucher.animate([
-            {opacity:1, transform:'scale(1)'},
-            {opacity:0.9, transform:'scale(1.02)'},
-            {opacity:1, transform:'scale(1)'}
-          ], {duration:500});
-          if (typeof player !== 'undefined' && player && player.playVideo) {
+          // visual pulse
+          try {
+            voucher.animate([
+              {opacity:1, transform:'scale(1)'},
+              {opacity:0.9, transform:'scale(1.02)'},
+              {opacity:1, transform:'scale(1)'}
+            ], {duration:500});
+          } catch (err) { /* ignore if animate not supported */ }
+
+          if (playerReady && player && typeof player.playVideo === 'function') {
             try {
               player.seekTo(0);
               player.playVideo();
-            } catch(err){ }
+              return;
+            } catch(err){
+              console.warn('replay failed (API):', err);
+            }
           }
-        } else openBox();
+
+          // fallback: open YT
+          try {
+            const win = window.open('https://www.youtube.com/watch?v=' + YT_ID, '_blank', 'noopener');
+            if (win) win.focus();
+          } catch (err) {}
+        } else {
+          openBox();
+        }
       });
 
-      // If user clicks the YouTube link, don't prevent default — open in new tab
+      // openYT is just a normal link fallback — we don't prevent default
       openYT.addEventListener('click', function(){ /* just a link fallback */ });
+
     })();
   </script>
 </body>

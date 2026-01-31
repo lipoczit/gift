@@ -3,224 +3,314 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-  <title>49. Szülinapi Meglepetés — Csak Neked</title>
+  <title>Meglepetés...</title>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
     :root {
-      --bg-dark: #0f0715;
-      --accent: #d94a8f; /* Triumph pink */
-      --accent-glow: #ff96c8;
-      --gold: #e0c097; /* Elegáns arany */
+      --bg-dark: #050505;
+      --intro-bg: #111;
+      --accent: #d94a8f;
+      --sexy-red: #c9004d; /* Triumph Vörös */
+      --gold: #e0c097;
       --text: #e6d9f0;
-      --box-color: #9b3b7a;
-      --lid-color: #c03d7d;
     }
 
     html, body {
       height: 100%;
       margin: 0;
-      font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+      font-family: 'Segoe UI', Roboto, sans-serif;
       background: var(--bg-dark);
       color: var(--text);
-      overflow-x: hidden;
+      overflow: hidden; /* Kezdetben görgetés tiltva */
     }
 
+    /* --- 1. INTRO SCREEN (SEJTELMES) --- */
+    #intro-screen {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: radial-gradient(circle at 50% 50%, #2a2a2a 0%, #000000 90%);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: opacity 1.5s ease-in-out;
+    }
+
+    .silhouette {
+      width: 180px;
+      height: auto;
+      fill: #333;
+      filter: drop-shadow(0 0 10px rgba(255,255,255,0.1));
+      animation: breathe 3s infinite ease-in-out;
+    }
+
+    .intro-text {
+      margin-top: 2rem;
+      font-size: 0.9rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: #666;
+      opacity: 0.7;
+      animation: fadeInOut 3s infinite;
+    }
+
+    @keyframes breathe {
+      0%, 100% { transform: scale(1); filter: drop-shadow(0 0 5px rgba(255,255,255,0.05)); }
+      50% { transform: scale(1.05); filter: drop-shadow(0 0 15px rgba(217, 74, 143, 0.3)); }
+    }
+    @keyframes fadeInOut {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 0.8; }
+    }
+
+    /* --- 2. FŐ SZÍNPAD --- */
     .wrap {
       min-height: 100vh;
+      opacity: 0; /* Kezdetben láthatatlan */
+      transition: opacity 2s ease;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 1rem;
-      background: radial-gradient(circle at 50% 30%, rgba(217, 74, 143, 0.15), transparent 60%);
+      background: radial-gradient(circle at 50% 30%, rgba(50, 0, 20, 0.4), transparent 70%);
+      overflow-y: auto;
     }
+
+    .wrap.visible { opacity: 1; }
 
     .stage {
       width: 100%;
       max-width: 600px;
       text-align: center;
-      perspective: 1200px; /* Erősebb 3D hatás */
+      perspective: 1500px; /* Mélyebb 3D */
     }
 
     h1 {
-      background: linear-gradient(to right, var(--accent-glow), var(--gold));
+      background: linear-gradient(to right, #ff96c8, #fff);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
-      font-size: 2.2rem;
-      margin-bottom: 0.5rem;
-    }
-
-    p.lead {
-      color: #b8a8c9;
+      font-size: 2rem;
+      font-weight: 300;
       margin-bottom: 2rem;
     }
 
-    /* --- A JAVÍTOTT DOBOZ --- */
-    .box-wrapper {
-      height: 220px;
-      display: flex;
-      justify-content: center;
-      align-items: flex-end;
-      margin-bottom: 2rem;
+    /* --- A DOBOZ (EXTRA SEXY) --- */
+    .box-scene {
+      width: 200px;
+      height: 140px;
+      margin: 0 auto 3rem;
       position: relative;
       transform-style: preserve-3d;
+      transform: rotateX(-10deg); /* Kicsit rálátunk fentről */
       cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
     }
 
-    .box {
-      width: 180px;
-      height: 120px;
-      position: relative;
-      transform-style: preserve-3d;
-      transition: transform 0.3s;
-    }
-    
-    .box:active { transform: scale(0.98); }
-
-    .box-body {
-      position: absolute;
+    .cube {
       width: 100%;
       height: 100%;
-      background: var(--box-color);
-      border-radius: 8px;
-      bottom: 0;
-      box-shadow: 0 15px 35px rgba(0,0,0,0.5);
-      z-index: 2;
-      /* Masni a testen */
-      background-image: linear-gradient(to right, transparent 45%, rgba(255,215,0,0.3) 45%, rgba(255,215,0,0.3) 55%, transparent 55%);
-    }
-
-    .box-lid {
       position: absolute;
-      width: 104%;
-      left: -2%;
-      height: 30px;
-      background: var(--lid-color);
-      top: 0;
-      border-radius: 8px 8px 0 0;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-      z-index: 5;
-      /* A titok nyitja: a forgási pont a tető HÁTSÓ éle */
-      transform-origin: top center;
-      transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); /* Ruganyos nyitás */
-      /* Masni a tetőn */
-      background-image: linear-gradient(to right, transparent 45%, rgba(255,215,0,0.4) 45%, rgba(255,215,0,0.4) 55%, transparent 55%);
+      transform-style: preserve-3d;
     }
 
-    /* KINYITÁS MECHANIKA */
-    .box-wrapper.is-open .box-lid {
-      /* Hátrafelé nyílik 130 fokot */
-      transform: rotateX(130deg);
-    }
-
-    /* --- A SZEXI TARTALOM (SVG Lingerie) --- */
-    .sexy-content {
+    /* Doboz oldalak */
+    .face {
       position: absolute;
-      bottom: 50px; /* A doboz alján kezd */
-      left: 50%;
-      transform: translateX(-50%) scale(0.5);
-      width: 100px;
-      height: auto;
-      opacity: 0;
-      transition: all 1s cubic-bezier(0.19, 1, 0.22, 1);
-      z-index: 1; /* A doboz teste mögött/benne */
-      pointer-events: none;
-      color: var(--gold); /* Az SVG színe */
+      border: 1px solid rgba(0,0,0,0.2);
     }
 
-    /* Amikor kinyílik: kiemelkedik */
-    .box-wrapper.is-open .sexy-content {
-      bottom: 140px; /* Kiemelkedik a doboz fölé */
-      opacity: 1;
-      transform: translateX(-50%) scale(1.1);
-      /* Miután kiemelkedett, elkezd pulzálni */
-      animation: heartbeat 1.5s ease-in-out infinite both;
-      animation-delay: 0.8s;
+    .face-back  { width: 200px; height: 140px; transform: translateZ(-100px); background: #5e1b3e; }
+    .face-left  { width: 200px; height: 140px; transform: rotateY(-90deg) translateZ(100px); background: #7a2b54; }
+    .face-right { width: 200px; height: 140px; transform: rotateY(90deg) translateZ(100px); background: #7a2b54; }
+    .face-bottom{ width: 200px; height: 200px; transform: rotateX(-90deg) translateZ(100px); background: #3d0e28; box-shadow: 0 0 50px rgba(0,0,0,0.8); }
+
+    /* A BELSŐ RÉSZ (Vörös selyem) */
+    .face-inner {
+      position: absolute;
+      width: 180px;
+      height: 180px;
+      left: 10px; top: -30px; /* Igazítás */
+      transform: rotateX(90deg) translateZ(-130px);
+      background: radial-gradient(circle, #ff0055 0%, #59001e 80%);
+      box-shadow: inset 0 0 20px #000;
+      border-radius: 5px;
     }
 
-    @keyframes heartbeat {
-      0% { transform: translateX(-50%) scale(1.1); }
-      50% { transform: translateX(-50%) scale(1.15); filter: drop-shadow(0 0 10px var(--accent)); }
-      100% { transform: translateX(-50%) scale(1.1); }
-    }
-
-
-    /* --- VOUCHER ÉS GOMBOK --- */
-    .hidden-content {
-      opacity: 0;
-      transform: translateY(20px);
-      transition: all 0.8s ease;
-      visibility: hidden;
-      height: 0; /* Hogy ne foglaljon helyet amíg rejtve van */
-    }
-
-    .box-wrapper.is-open ~ .hidden-content {
-      opacity: 1;
-      transform: translateY(0);
-      visibility: visible;
-      height: auto;
-      margin-top: 3rem;
-    }
-
-    .voucher {
-      background: linear-gradient(145deg, #2a143f, #1c0d2a);
-      border: 2px dashed var(--accent);
-      padding: 1.5rem;
-      border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    /* MOZGÓ RÉSZEK */
+    /* Tető */
+    .face-top {
+      width: 204px; height: 204px;
+      background: #d94a8f;
+      position: absolute;
+      left: -2px;
+      transform: rotateX(90deg) translateZ(100px);
+      transform-origin: top; /* Hátul a tengely */
+      transition: transform 1s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      background-image: linear-gradient(45deg, transparent 45%, #ffd700 45%, #ffd700 55%, transparent 55%);
+      background-size: 40px 40px; /* Masni minta */
+      z-index: 10;
     }
     
-    .cta-btn {
+    /* Előlap (Lehajlik) */
+    .face-front {
+      width: 200px; height: 140px;
+      background: #9b3b7a;
+      position: absolute;
+      transform: translateZ(100px);
+      transform-origin: bottom; /* Alul a tengely */
+      transition: transform 1.2s ease-in-out;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 5;
+    }
+    .face-front::after { content: '🎁'; font-size: 3rem; }
+
+    /* KINYITÁS */
+    .box-scene.open .face-top {
+      transform: rotateX(210deg) translateZ(100px); /* Hátracsapódik */
+    }
+    .box-scene.open .face-front {
+      transform: rotateX(-100deg) translateZ(100px); /* Lehajlik */
+    }
+
+    /* --- LINGERIE POPUP (Sexy elem) --- */
+    .lingerie-pop {
+      position: absolute;
+      width: 120px;
+      left: 40px;
+      bottom: 20px;
+      transform: translateZ(-50px) translateY(50px) scale(0.5);
+      opacity: 0;
+      transition: all 1.5s ease;
+      transition-delay: 0.5s;
+      pointer-events: none;
+      filter: drop-shadow(0 0 15px rgba(255, 0, 80, 0.6));
+    }
+
+    .box-scene.open .lingerie-pop {
+      opacity: 1;
+      transform: translateZ(0px) translateY(-80px) scale(1.2); /* Kiemelkedik */
+    }
+
+    /* --- VOUCHER --- */
+    .voucher-wrap {
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: all 1s ease;
+      transform: translateY(30px);
+    }
+    .box-scene.open ~ .voucher-wrap {
+      max-height: 600px;
+      opacity: 1;
+      transform: translateY(0);
+      margin-top: 2rem;
+    }
+
+    .sexy-voucher {
+      background: linear-gradient(135deg, #1a0510, #2b0a1a);
+      border: 1px solid var(--sexy-red);
+      padding: 2rem;
+      border-radius: 2px;
+      position: relative;
+      box-shadow: 0 0 30px rgba(201, 0, 77, 0.2);
+    }
+    
+    /* Csipke minta overlay */
+    .sexy-voucher::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1h2v2H1V1zm4 0h2v2H5V1zm4 0h2v2H9V1zm4 0h2v2h-2V1zm4 0h2v2h-2V1zM1 5h2v2H1V5zm4 0h2v2H5V5zm4 0h2v2H9V5zm4 0h2v2h-2V5zm4 0h2v2h-2V5zM1 9h2v2H1V9zm4 0h2v2H5V9zm4 0h2v2H9V9zm4 0h2v2h-2V9zm4 0h2v2h-2V9z' fill='%23d94a8f' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+      pointer-events: none;
+    }
+
+    .price-tag {
+      font-size: 2.5rem;
+      color: #fff;
+      font-weight: 700;
+      text-shadow: 0 0 10px var(--sexy-red);
+      margin: 0.5rem 0;
+    }
+
+    .brand {
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-weight: bold;
+    }
+
+    .cta-sexy {
       display: inline-block;
       margin-top: 1.5rem;
-      padding: 0.8rem 2rem;
-      background: var(--accent);
-      color: white;
+      padding: 0.8rem 2.5rem;
+      background: var(--sexy-red);
+      color: #fff;
       text-decoration: none;
-      border-radius: 30px;
       font-weight: bold;
-      box-shadow: 0 5px 15px rgba(217, 74, 143, 0.4);
+      border-radius: 50px;
+      box-shadow: 0 0 20px rgba(201, 0, 77, 0.5);
       transition: 0.3s;
+      z-index: 2;
+      position: relative;
     }
-    .cta-btn:hover { box-shadow: 0 8px 25px rgba(217, 74, 143, 0.6); transform: translateY(-2px);}
+    .cta-sexy:hover {
+      background: #ff0055;
+      box-shadow: 0 0 30px rgba(255, 0, 85, 0.8);
+    }
 
-    /* YouTube fallback */
-    #player-container { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
+    #player-container { width: 0; height: 0; overflow: hidden; opacity: 0; }
   </style>
 </head>
 <body>
 
-  <div class="wrap">
+  <div id="intro-screen">
+    <svg class="silhouette" viewBox="0 0 200 300" xmlns="http://www.w3.org/2000/svg">
+      <path d="M70,20 C90,20 110,40 115,60 C130,80 140,110 120,150 C110,170 140,200 150,230 C160,260 140,290 140,290 L60,290 C60,290 40,260 50,230 C60,200 90,170 80,150 C60,110 70,80 85,60 C90,40 60,20 70,20 Z" fill="#222" />
+    </svg>
+    <div class="intro-text">Kattints a belépéshez</div>
+  </div>
+
+  <div class="wrap" id="main-wrap">
     <div class="stage">
       <h1>49. Szülinapi Meglepetés</h1>
-      <p class="lead">Olyan vagy, mintha 49 helyett 30 lennél... De ma én vagyok a győztes, és Neked adom a fődíjat.</p>
+      
+      <div class="box-scene" id="giftBox">
+        <div class="cube">
+          <div class="face face-back"></div>
+          <div class="face face-left"></div>
+          <div class="face face-right"></div>
+          <div class="face face-bottom"></div>
+          <div class="face-inner"></div> <svg class="lingerie-pop" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+            <path fill="#c9004d" d="M380,90 C350,90 320,110 300,130 C280,110 250,90 220,90 C160,90 120,140 120,200 C120,280 160,400 180,450 L320,450 C340,400 380,280 380,200 C380,140 340,90 380,90 Z M250,150 L250,440" stroke="#ff6699" stroke-width="5"/>
+            <path d="M180,200 Q250,250 320,200" fill="none" stroke="#59001e" stroke-width="3" opacity="0.5"/>
+          </svg>
 
-      <div class="box-wrapper" id="theBox">
-        <svg class="sexy-content" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12,2C10.89,2 10,2.89 10,4V11.5C10,11.5 8,13 8,16C8,19 10,22 12,22C14,22 16,19 16,16C16,13 14,11.5 14,11.5V4C14,2.89 13.11,2 12,2M12,4C12.55,4 13,4.45 13,5H11C11,4.45 11.45,4 12,4M9.5,14.5C9.5,14.5 10.5,13.5 12,13.5C13.5,13.5 14.5,14.5 14.5,14.5C14.8,15.5 14.5,16.5 14,17.5C13.5,18.5 12.5,19.5 12,19.5C11.5,19.5 10.5,18.5 10,17.5C9.5,16.5 9.2,15.5 9.5,14.5M7,16C7,14 8,12.5 9,11.5V20.5C8,19.5 7,18 7,16M17,16C17,18 16,19.5 15,20.5V11.5C16,12.5 17,14 17,16Z" />
-        </svg>
-        
-        <div class="box">
-          <div class="box-lid"></div>
-          <div class="box-body"></div>
+          <div class="face face-top"></div>
+          <div class="face face-front"></div>
         </div>
       </div>
-      
-      <p style="font-size: 0.9rem; color: var(--accent-glow); margin-top: -1rem;">(Kattints a dobozra)</p>
 
-      <div class="hidden-content">
-        <div class="voucher">
-          <h2 style="color: var(--gold); margin: 0;">Triumph Utalvány</h2>
-          <p style="font-size: 2rem; font-weight: 800; margin: 0.5rem 0;">49.000 Ft</p>
-          <p>Beváltható velem együtt: 2026.02.02 – 02.04.</p>
-          <p style="color: var(--accent-glow); font-style: italic;">"Fejtsd ki magad, válaszd ki, mit szeretnél viselni rajtam..."</p>
+      <p style="color: #666; font-size: 0.9rem; margin-top:-2rem;">(Kattints a dobozra)</p>
+
+      <div class="voucher-wrap">
+        <div class="sexy-voucher">
+          <div class="brand">Triumph Lingerie</div>
+          <div class="price-tag">30.000 Ft</div>
+          <div style="margin: 1rem 0; color: #ccc; line-height: 1.6;">
+            Nem csak egy fehérnemű.<br>
+            <span style="color: var(--sexy-red);">Hanem amit kiváltasz vele.</span><br><br>
+            <strong>Beváltható velem együtt:</strong><br>
+            Polgár, 2026.02.02 – 2026.02.04.
+          </div>
+          <a href="#" class="cta-sexy" id="replayBtn">Zene & Konfetti újra</a>
         </div>
         
-        <a href="#" id="replayBtn" class="cta-btn">Zene és Konfetti újra! 🎉</a>
-        
-        <p style="margin-top: 2rem; font-size: 0.8rem;">
-          Zene: Rocky (Gonna Fly Now). <a href="https://www.youtube.com/watch?v=ioE_O7Lm0I4" target="_blank" style="color:var(--accent-glow)">Ha nem indulna el, kattints ide.</a>
+        <p style="margin-top: 1.5rem; font-size: 0.8rem; opacity: 0.6;">
+          Zene: Rocky Theme. <a href="https://www.youtube.com/watch?v=ioE_O7Lm0I4" target="_blank" style="color:white;">Fallback link</a>
         </p>
       </div>
 
@@ -230,7 +320,7 @@
   <div id="player-container"><div id="player"></div></div>
 
   <script>
-    // --- YouTube API ---
+    // --- 1. YOUTUBE API ---
     let player; var isPlayerReady = false; const VIDEO_ID = 'ioE_O7Lm0I4';
     var tag = document.createElement('script'); tag.src = "https://www.youtube.com/iframe_api";
     var firstScriptTag = document.getElementsByTagName('script')[0]; firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
@@ -238,25 +328,73 @@
       player = new YT.Player('player', { height:'200', width:'200', videoId: VIDEO_ID, playerVars:{'playsinline':1,'controls':0}, events:{'onReady': ()=>{isPlayerReady=true; player.setVolume(100);}} });
     }
 
-    // --- Interakció ---
-    const theBox = document.getElementById('theBox');
+    // --- 2. INTRO KEZELÉSE ---
+    const introScreen = document.getElementById('intro-screen');
+    const mainWrap = document.getElementById('main-wrap');
+
+    introScreen.addEventListener('click', () => {
+      introScreen.style.opacity = '0';
+      setTimeout(() => {
+        introScreen.style.display = 'none';
+        mainWrap.classList.add('visible');
+        document.body.style.overflowY = 'auto'; // Görgetés engedélyezése
+      }, 1500);
+    });
+
+    // --- 3. DOBOZ NYITÁS & KONFETTI ---
+    const giftBox = document.getElementById('giftBox');
     const replayBtn = document.getElementById('replayBtn');
 
-    function triggerSurprise() {
-      // 1. Doboz nyitása (CSS osztály hozzáadása)
-      theBox.classList.add('is-open');
+    function openBox() {
+      if (giftBox.classList.contains('open')) {
+        fireConfetti();
+        playMusic();
+        return;
+      }
       
-      // 2. Konfetti
-      confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 }, colors: ['#d94a8f', '#e0c097', '#ffffff'] });
+      // Nyitás animáció
+      giftBox.classList.add('open');
+      
+      // Konfetti késleltetve, amikor a tető felcsapódik
+      setTimeout(fireConfetti, 500);
+      playMusic();
+    }
 
-      // 3. Zene indítása (biztonságosan)
+    function playMusic() {
       if(isPlayerReady && player) { 
         try { player.seekTo(0); player.playVideo(); } catch(e){} 
       }
     }
 
-    theBox.addEventListener('click', triggerSurprise);
-    replayBtn.addEventListener('click', (e)=>{ e.preventDefault(); triggerSurprise(); });
+    function fireConfetti() {
+      var end = Date.now() + (3 * 1000);
+      var colors = ['#c9004d', '#ff96c8', '#ffffff'];
+
+      (function frame() {
+        confetti({
+          particleCount: 3,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0 },
+          colors: colors
+        });
+        confetti({
+          particleCount: 3,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1 },
+          colors: colors
+        });
+
+        if (Date.now() < end) {
+          requestAnimationFrame(frame);
+        }
+      }());
+    }
+
+    giftBox.addEventListener('click', openBox);
+    replayBtn.addEventListener('click', (e)=>{ e.preventDefault(); fireConfetti(); playMusic(); });
+
   </script>
 </body>
 </html>

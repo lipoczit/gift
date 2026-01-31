@@ -3,64 +3,235 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Ajándék Neked — Meglepetés</title>
+  <title>30. szülinapi meglepetés — Csak Neked</title>
   <style>
-    :root{--bg:#fff7f3;--card:#fffef8;--accent:#b33a6a;--shadow:rgba(0,0,0,0.12)}
-    html,body{height:100%;margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial;background:var(--bg);color:#222}
-    .wrap{min-height:100%;display:flex;align-items:center;justify-content:center;padding:2rem}
-    .stage{width:760px;max-width:96vw;text-align:center}
-    .card{background:linear-gradient(180deg,var(--card),#fff3f0);padding:2rem;border-radius:14px;box-shadow:0 12px 36px var(--shadow)}
-    h1{margin:0 0 .25rem;color:var(--accent);font-size:1.9rem}
-    p.lead{margin:.25rem 0 1rem;color:#444}
-    .box-wrap{display:flex;align-items:center;justify-content:center;margin:1.25rem 0}
-    .box{width:220px;height:160px;position:relative;transform-style:preserve-3d;perspective:800px;cursor:pointer;margin:0 auto}
-    .box-base{width:100%;height:100%;background:#f6dfe6;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,0.18);position:absolute;left:0;top:0;display:flex;align-items:center;justify-content:center;transform-origin:50% 0%;transition:transform 800ms cubic-bezier(.2,.9,.3,1);backface-visibility:hidden}
-    .box-lid{width:110%;height:28%;background:#e74f84;border-radius:8px 8px 0 0;position:absolute;left:-5%;top:-6%;transform-origin:50% 100%;transition:transform 700ms cubic-bezier(.2,.9,.3,1);box-shadow:0 8px 18px rgba(0,0,0,0.14)}
-    .box.open .box-lid{transform:rotateX(-75deg) translateY(-6px)}
-    .box.open .box-base{transform:translateY(10px) scale(.99)}
-    .gift-msg{opacity:0;transform:translateY(12px) scale(.98);transition:opacity 600ms, transform 600ms;pointer-events:none;font-weight:600}
-    .box.open + .gift-msg{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
-    .voucher{margin-top:1rem;padding:1rem;border-radius:10px;background:linear-gradient(180deg,#fff,#fff8f2);border:1px dashed #e0b0c0;color:#2b2b2b}
-    .cta{display:inline-block;margin-top:1rem;padding:.6rem 1rem;border-radius:10px;background:var(--accent);color:white;text-decoration:none}
-    footer{margin-top:1rem;color:#666;font-size:.9rem}
-    .small{font-size:.95rem;color:#333;margin-top:.5rem}
-    @media (max-width:480px){.box{width:180px;height:130px}}
-    /* Hidden YouTube container to keep layout clean */
-    #player{width:0;height:0;overflow:hidden}
+    :root {
+      --bg: #0f0715;
+      --card: #1c0d2a;
+      --accent: #d94a8f;
+      --accent-light: #ff96c8;
+      --text: #e6d9f0;
+      --shadow: rgba(0,0,0,0.3);
+    }
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+    .wrap {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      background: radial-gradient(circle at 50% 30%, rgba(217, 74, 143, 0.15), transparent 50%),
+                  radial-gradient(circle at 70% 80%, rgba(255, 150, 200, 0.1), transparent 60%);
+    }
+    .stage {
+      width: 760px;
+      max-width: 96vw;
+      text-align: center;
+    }
+    .card {
+      background: linear-gradient(180deg, var(--card), #2a143f);
+      padding: 2.4rem 2rem;
+      border-radius: 16px;
+      box-shadow: 0 16px 48px var(--shadow);
+      border: 1px solid rgba(217, 74, 143, 0.3);
+    }
+    h1 {
+      margin: 0 0 .25rem;
+      color: var(--accent-light);
+      font-size: 2.2rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    p.lead {
+      margin: .25rem 0 1.2rem;
+      color: #b8a8c9;
+      font-size: 1.1rem;
+    }
+    .box-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 1.5rem 0 2rem;
+    }
+    .box {
+      width: 240px;
+      height: 180px;
+      position: relative;
+      transform-style: preserve-3d;
+      perspective: 800px;
+      cursor: pointer;
+      margin: 0 auto;
+    }
+    .box-base {
+      width: 100%;
+      height: 100%;
+      background: #9b3b7a;
+      border-radius: 10px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.3);
+      position: absolute;
+      left: 0;
+      top: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform-origin: 50% 0%;
+      transition: transform 800ms cubic-bezier(.2,.9,.3,1);
+      backface-visibility: hidden;
+      border: 2px solid rgba(255,255,255,0.15);
+    }
+    .box-lid {
+      width: 110%;
+      height: 30%;
+      background: #d94a8f;
+      border-radius: 10px 10px 0 0;
+      position: absolute;
+      left: -5%;
+      top: -6%;
+      transform-origin: 50% 100%;
+      transition: transform 700ms cubic-bezier(.2,.9,.3,1);
+      box-shadow: 0 10px 22px rgba(0,0,0,0.25);
+      border: 2px solid rgba(255,255,255,0.15);
+    }
+    .box.open .box-lid {
+      transform: rotateX(-78deg) translateY(-8px);
+    }
+    .box.open .box-base {
+      transform: translateY(12px) scale(.98);
+    }
+    .gift-msg {
+      opacity: 0;
+      transform: translateY(16px) scale(.96);
+      transition: opacity 600ms, transform 600ms;
+      pointer-events: none;
+      font-weight: 600;
+      margin-top: 1.2rem;
+    }
+    .box.open + .gift-msg {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+    .voucher {
+      margin-top: 1.2rem;
+      padding: 1.1rem 1rem;
+      border-radius: 12px;
+      background: linear-gradient(180deg, #361f4a, #2a143f);
+      border: 1px dashed #b869a4;
+      color: #e6d9f0;
+      font-size: 1.05rem;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+    }
+    .voucher strong {
+      color: var(--accent-light);
+    }
+    .cta {
+      display: inline-block;
+      margin-top: 1.2rem;
+      padding: .7rem 1.3rem;
+      border-radius: 14px;
+      background: var(--accent);
+      color: white;
+      text-decoration: none;
+      font-weight: 600;
+      box-shadow: 0 6px 16px rgba(217, 74, 143, 0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(217, 74, 143, 0.5);
+    }
+    footer {
+      margin-top: 1.8rem;
+      color: #7a6a89;
+      font-size: .9rem;
+    }
+    .small {
+      font-size: .95rem;
+      color: #a898b8;
+      margin-top: .6rem;
+    }
+    .hidden {
+      display: none;
+    }
+    @media (max-width: 480px) {
+      .box {
+        width: 190px;
+        height: 140px;
+      }
+      h1 {
+        font-size: 1.9rem;
+      }
+    }
+    /* YouTube container – keep it tiny */
+    #player {
+      width: 0;
+      height: 0;
+      overflow: hidden;
+    }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="stage">
       <div class="card" role="main" aria-labelledby="title">
-        <h1 id="title">Egy kis meglepetés Neked</h1>
-        <p class="lead">Kattints a dobozra, hogy kinyíljon — van benne valami különleges.</p>
+        <h1 id="title">30. szülinapi meglepetés</h1>
+        <p class="lead">
+          Olyan vagy, mintha 30 helyett 49 lennél…<br>
+          De ma én vagyok a győztes – és Neked adom a fődíjat.
+        </p>
 
         <div class="box-wrap">
           <div id="box" class="box" role="button" tabindex="0" aria-pressed="false" aria-label="Kattints a dobozra a meglepetéshez">
             <div class="box-lid" aria-hidden="true"></div>
             <div class="box-base" aria-hidden="true">
-              <div style="font-size:2.2rem;color:#fff;font-weight:700;">🎁</div>
+              <div style="font-size:2.4rem;color:#fff;font-weight:700;">🎁</div>
             </div>
           </div>
         </div>
 
         <div class="gift-msg" id="giftMsg" aria-live="polite">
-          <div class="small">Gratulálok — nyisd ki a meglepetést!</div>
-          <div class="voucher" id="voucher">
-            <div style="font-size:1.2rem;color:var(--accent);margin-bottom:.35rem;">30 000 Ft</div>
-            <div>Triumph vásárlási utalvány</div>
-            <div style="margin-top:.35rem;font-weight:600;">Beváltás helye: Polgár</div>
-            <div>Időpont: 2026.02.02 – 2026.02.04</div>
+          <div class="small">
+            <strong>Kattints még egyszer, ha szeretnéd újra hallani a zenét.</strong>
           </div>
 
-          <a class="cta" id="revealAgain" href="#" style="display:inline-block;">Megmutat</a>
+          <div class="voucher" id="voucher">
+            <div style="font-size:1.3rem;color:var(--accent-light);margin-bottom:.4rem;">
+              30 000 Ft
+            </div>
+            <div>
+              <strong>Triumph vásárlási utalvány</strong>
+            </div>
+            <div style="margin-top:.35rem;">
+              <strong>Beváltható velem együtt</strong> – Polgár, 2026.02.02–2026.02.04 között.
+            </div>
+            <div style="margin-top:.4rem;color:#b8a8c9;font-size:.95rem;">
+              Fejtsd ki magad, válaszd ki, mit szeretnél viselni rajtam…<br>
+              A meglepetés csak most kezdődik.
+            </div>
+          </div>
+
+          <a class="cta" id="revealAgain" href="#" style="display:inline-block;">
+            Újra lejátszom a zenét
+          </a>
         </div>
 
-        <p class="small">Zene: ha a lejátszás blokkolva van, használd a "YouTube megnyitása" gombot.</p>
-        <p class="small"><a id="openYT" href="https://www.youtube.com/watch?v=r81AviZECUE" target="_blank" rel="noopener">YouTube megnyitása</a></p>
+        <p class="small">
+          Zene: ha a lejátszás blokkolva van, használd a „YouTube megnyitása” gombot.
+        </p>
+        <p class="small">
+          <a id="openYT" href="https://www.youtube.com/watch?v=ioE_O7Lm0I4" target="_blank" rel="noopener">
+            YouTube megnyitása (Rocky – Gonna Fly Now)
+          </a>
+        </p>
 
-        <footer>© 2026 — Ajándék</footer>
+        <footer>© 2026 — Csak Neked, egyedül.</footer>
       </div>
     </div>
   </div>
@@ -68,8 +239,8 @@
   <!-- YouTube IFrame API + hidden player -->
   <div id="player"></div>
   <script>
-    // YouTube video ID
-    const YT_ID = 'r81AviZECUE';
+    // YouTube video ID – Rocky Theme
+    const YT_ID = 'ioE_O7Lm0I4'; // Bill Conti – Gonna Fly Now
 
     // Load YouTube IFrame API
     let tag = document.createElement('script');
@@ -79,10 +250,19 @@
     let player;
     function onYouTubeIframeAPIReady() {
       player = new YT.Player('player', {
-        height: '0', width: '0',
+        height: '0',
+        width: '0',
         videoId: YT_ID,
-        playerVars: { 'autoplay': 0, 'controls': 1, 'rel': 0, 'modestbranding': 1 },
-        events: { 'onReady': onPlayerReady }
+        playerVars: {
+          'autoplay': 0,
+          'controls': 1,
+          'rel': 0,
+          'modestbranding': 1,
+          'playsinline': 1
+        },
+        events: {
+          'onReady': onPlayerReady
+        }
       });
     }
 
@@ -123,15 +303,25 @@
 
       box.addEventListener('click', openBox);
       box.addEventListener('keydown', function(e){
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openBox(); }
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openBox();
+        }
       });
 
       revealAgain.addEventListener('click', function(e){
         e.preventDefault();
         if (box.classList.contains('open')) {
-          voucher.animate([{opacity:1, transform:'scale(1)'},{opacity:0.9, transform:'scale(1.02)'},{opacity:1, transform:'scale(1)'}], {duration:500});
+          voucher.animate([
+            {opacity:1, transform:'scale(1)'},
+            {opacity:0.9, transform:'scale(1.02)'},
+            {opacity:1, transform:'scale(1)'}
+          ], {duration:500});
           if (typeof player !== 'undefined' && player && player.playVideo) {
-            try { player.seekTo(0); player.playVideo(); } catch(err){ }
+            try {
+              player.seekTo(0);
+              player.playVideo();
+            } catch(err){ }
           }
         } else openBox();
       });

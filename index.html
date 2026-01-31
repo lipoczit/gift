@@ -8,21 +8,21 @@
   <style>
     :root {
       --bg-dark: #0f0715;
-      --card-bg: #1a0b25;
-      --accent: #d94a8f; /* Triumph málna/pink */
+      --accent: #d94a8f; /* Triumph pink */
       --accent-glow: #ff96c8;
-      --gold: #e0c097; /* Elegáns arany a szövegekhez */
+      --gold: #e0c097; /* Elegáns arany */
       --text: #e6d9f0;
+      --box-color: #9b3b7a;
+      --lid-color: #c03d7d;
     }
 
     html, body {
       height: 100%;
       margin: 0;
-      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      font-family: 'Segoe UI', Roboto, Arial, sans-serif;
       background: var(--bg-dark);
       color: var(--text);
       overflow-x: hidden;
-      -webkit-font-smoothing: antialiased;
     }
 
     .wrap {
@@ -31,400 +31,232 @@
       align-items: center;
       justify-content: center;
       padding: 1rem;
-      background: radial-gradient(circle at 50% 0%, rgba(217, 74, 143, 0.2), transparent 70%);
+      background: radial-gradient(circle at 50% 30%, rgba(217, 74, 143, 0.15), transparent 60%);
     }
 
     .stage {
       width: 100%;
       max-width: 600px;
       text-align: center;
-      perspective: 1000px;
-    }
-
-    .card {
-      background: linear-gradient(160deg, #2d1640 0%, #150820 100%);
-      padding: 2.5rem 1.5rem;
-      border-radius: 24px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.5), 
-                  0 0 0 1px rgba(255, 255, 255, 0.1) inset;
-      position: relative;
-      z-index: 2;
+      perspective: 1200px; /* Erősebb 3D hatás */
     }
 
     h1 {
-      margin: 0 0 0.5rem;
       background: linear-gradient(to right, var(--accent-glow), var(--gold));
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
-      font-size: 2.4rem;
-      font-weight: 800;
-      line-height: 1.2;
+      font-size: 2.2rem;
+      margin-bottom: 0.5rem;
     }
 
     p.lead {
-      margin: 0.5rem 0 2rem;
       color: #b8a8c9;
-      font-size: 1.15rem;
-      line-height: 1.5;
+      margin-bottom: 2rem;
     }
 
-    /* --- DOBOZ ANIMÁCIÓ --- */
-    .box-container {
-      height: 200px;
+    /* --- A JAVÍTOTT DOBOZ --- */
+    .box-wrapper {
+      height: 220px;
       display: flex;
       justify-content: center;
-      align-items: center;
+      align-items: flex-end;
       margin-bottom: 2rem;
+      position: relative;
+      transform-style: preserve-3d;
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
     }
 
     .box {
-      width: 160px;
+      width: 180px;
       height: 120px;
       position: relative;
       transform-style: preserve-3d;
-      transition: transform 0.5s ease;
-    }
-
-    .box:hover {
-      transform: scale(1.02);
-    }
-
-    .box-body {
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(135deg, #a63e75, #7a2b54);
-      border-radius: 4px;
-      position: absolute;
-      bottom: 0;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      transition: transform 0.3s;
     }
     
-    /* Masni a dobozon */
-    .box-body::after {
-      content: '';
+    .box:active { transform: scale(0.98); }
+
+    .box-body {
       position: absolute;
-      top: 0; bottom: 0; left: 50%;
-      width: 20px;
-      background: rgba(255,215,0, 0.3);
-      transform: translateX(-50%);
-      border-left: 1px solid rgba(255,255,255,0.2);
-      border-right: 1px solid rgba(255,255,255,0.2);
+      width: 100%;
+      height: 100%;
+      background: var(--box-color);
+      border-radius: 8px;
+      bottom: 0;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+      z-index: 2;
+      /* Masni a testen */
+      background-image: linear-gradient(to right, transparent 45%, rgba(255,215,0,0.3) 45%, rgba(255,215,0,0.3) 55%, transparent 55%);
     }
 
     .box-lid {
+      position: absolute;
       width: 104%;
-      height: 25px; /* Tető magassága */
-      background: #d94a8f;
-      position: absolute;
-      top: 0;
       left: -2%;
-      border-radius: 4px;
-      transform-origin: 50% 100%; /* Hátul nyílik */
-      transition: transform 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-      z-index: 10;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    /* Masni a tetőn */
-    .box-lid::before {
-      content: '';
-      position: absolute;
-      top: 0; bottom: 0; left: 50%;
-      width: 20px;
-      background: rgba(255,215,0, 0.4);
-      transform: translateX(-50%);
-    }
-
-    .box-lid-top {
-      position: absolute;
-      bottom: 100%;
-      left: 0;
-      width: 100%;
-      height: 100%; /* A tető lapja */
-      background: #c03d7d;
-      border-radius: 4px 4px 0 0;
-      transform-origin: bottom;
-      transform: rotateX(90deg); /* 3D hatás miatt */
-      display: none; /* Egyszerűsítés végett most csak a "front" látszik, de így is működik */
-    }
-
-    /* "OPEN" állapot */
-    .box.is-open .box-lid {
-      transform: rotateX(-110deg) translateY(-10px);
-    }
-    
-    .box.is-open .gift-emoji {
-      opacity: 1;
-      transform: translate(-50%, -100%) scale(1.2);
-    }
-
-    .gift-emoji {
-      font-size: 3rem;
-      position: absolute;
-      left: 50%;
-      top: 40%;
-      transform: translate(-50%, 0) scale(0.5);
-      opacity: 0;
-      transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      transition-delay: 0.2s;
-      pointer-events: none;
+      height: 30px;
+      background: var(--lid-color);
+      top: 0;
+      border-radius: 8px 8px 0 0;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
       z-index: 5;
+      /* A titok nyitja: a forgási pont a tető HÁTSÓ éle */
+      transform-origin: top center;
+      transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); /* Ruganyos nyitás */
+      /* Masni a tetőn */
+      background-image: linear-gradient(to right, transparent 45%, rgba(255,215,0,0.4) 45%, rgba(255,215,0,0.4) 55%, transparent 55%);
     }
 
-    /* --- VOUCHER --- */
-    .voucher-container {
-      height: 0;
-      overflow: hidden;
-      opacity: 0;
-      transition: opacity 1s, height 0.5s;
+    /* KINYITÁS MECHANIKA */
+    .box-wrapper.is-open .box-lid {
+      /* Hátrafelé nyílik 130 fokot */
+      transform: rotateX(130deg);
     }
 
-    .box.is-open ~ .voucher-container {
+    /* --- A SZEXI TARTALOM (SVG Lingerie) --- */
+    .sexy-content {
+      position: absolute;
+      bottom: 50px; /* A doboz alján kezd */
+      left: 50%;
+      transform: translateX(-50%) scale(0.5);
+      width: 100px;
       height: auto;
+      opacity: 0;
+      transition: all 1s cubic-bezier(0.19, 1, 0.22, 1);
+      z-index: 1; /* A doboz teste mögött/benne */
+      pointer-events: none;
+      color: var(--gold); /* Az SVG színe */
+    }
+
+    /* Amikor kinyílik: kiemelkedik */
+    .box-wrapper.is-open .sexy-content {
+      bottom: 140px; /* Kiemelkedik a doboz fölé */
       opacity: 1;
-      overflow: visible;
+      transform: translateX(-50%) scale(1.1);
+      /* Miután kiemelkedett, elkezd pulzálni */
+      animation: heartbeat 1.5s ease-in-out infinite both;
+      animation-delay: 0.8s;
+    }
+
+    @keyframes heartbeat {
+      0% { transform: translateX(-50%) scale(1.1); }
+      50% { transform: translateX(-50%) scale(1.15); filter: drop-shadow(0 0 10px var(--accent)); }
+      100% { transform: translateX(-50%) scale(1.1); }
+    }
+
+
+    /* --- VOUCHER ÉS GOMBOK --- */
+    .hidden-content {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.8s ease;
+      visibility: hidden;
+      height: 0; /* Hogy ne foglaljon helyet amíg rejtve van */
+    }
+
+    .box-wrapper.is-open ~ .hidden-content {
+      opacity: 1;
+      transform: translateY(0);
+      visibility: visible;
+      height: auto;
+      margin-top: 3rem;
     }
 
     .voucher {
-      background: #fff;
-      color: #333;
+      background: linear-gradient(145deg, #2a143f, #1c0d2a);
+      border: 2px dashed var(--accent);
       padding: 1.5rem;
-      border-radius: 2px;
-      margin-top: 1rem;
-      position: relative;
-      /* Papír hatás */
-      background-image: radial-gradient(#f0f0f0 15%, transparent 16%), radial-gradient(#f0f0f0 15%, transparent 16%);
-      background-size: 10px 10px;
-      background-color: #fffbf0;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-      transform: rotate(-2deg);
-      border: 2px dashed #d94a8f;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
     }
-
-    .voucher h2 {
-      margin: 0;
-      color: #d94a8f;
-      font-size: 1.5rem;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .amount {
-      font-size: 2.5rem;
-      font-weight: 800;
-      color: #333;
-      margin: 0.5rem 0;
-      display: block;
-    }
-
-    .details {
-      font-size: 0.95rem;
-      color: #666;
-      line-height: 1.4;
-      margin-top: 1rem;
-    }
-
-    .cta-button {
+    
+    .cta-btn {
       display: inline-block;
       margin-top: 1.5rem;
-      padding: 0.8rem 1.5rem;
+      padding: 0.8rem 2rem;
       background: var(--accent);
       color: white;
       text-decoration: none;
-      border-radius: 50px;
+      border-radius: 30px;
       font-weight: bold;
-      box-shadow: 0 4px 15px rgba(217, 74, 143, 0.4);
-      transition: transform 0.2s;
+      box-shadow: 0 5px 15px rgba(217, 74, 143, 0.4);
+      transition: 0.3s;
     }
-    
-    .cta-button:active {
-      transform: scale(0.95);
-    }
+    .cta-btn:hover { box-shadow: 0 8px 25px rgba(217, 74, 143, 0.6); transform: translateY(-2px);}
 
-    .yt-fallback {
-      font-size: 0.8rem;
-      margin-top: 1rem;
-      opacity: 0.7;
-    }
-    .yt-fallback a { color: var(--accent-glow); }
-
-    /* YouTube player elrejtése, de nem 0x0 méretben (Chrome trükk) */
-    #player-container {
-      position: absolute;
-      top: -9999px;
-      left: -9999px;
-      width: 1px; 
-      height: 1px;
-      opacity: 0.01;
-      pointer-events: none;
-    }
+    /* YouTube fallback */
+    #player-container { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
   </style>
 </head>
 <body>
 
   <div class="wrap">
     <div class="stage">
-      <div class="card">
-        <h1>49. Szülinapi Meglepetés</h1>
-        <p class="lead">
-          Olyan vagy, mintha 49 helyett 30 lennél…<br>
-          De ma én vagyok a győztes – és Neked adom a fődíjat.
-        </p>
+      <h1>49. Szülinapi Meglepetés</h1>
+      <p class="lead">Olyan vagy, mintha 49 helyett 30 lennél... De ma én vagyok a győztes, és Neked adom a fődíjat.</p>
 
-        <div class="box-container" id="giftBox">
-          <div class="box">
-            <div class="box-lid"></div>
-            <div class="box-body"></div>
-            <div class="gift-emoji">👙</div> </div>
+      <div class="box-wrapper" id="theBox">
+        <svg class="sexy-content" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12,2C10.89,2 10,2.89 10,4V11.5C10,11.5 8,13 8,16C8,19 10,22 12,22C14,22 16,19 16,16C16,13 14,11.5 14,11.5V4C14,2.89 13.11,2 12,2M12,4C12.55,4 13,4.45 13,5H11C11,4.45 11.45,4 12,4M9.5,14.5C9.5,14.5 10.5,13.5 12,13.5C13.5,13.5 14.5,14.5 14.5,14.5C14.8,15.5 14.5,16.5 14,17.5C13.5,18.5 12.5,19.5 12,19.5C11.5,19.5 10.5,18.5 10,17.5C9.5,16.5 9.2,15.5 9.5,14.5M7,16C7,14 8,12.5 9,11.5V20.5C8,19.5 7,18 7,16M17,16C17,18 16,19.5 15,20.5V11.5C16,12.5 17,14 17,16Z" />
+        </svg>
+        
+        <div class="box">
+          <div class="box-lid"></div>
+          <div class="box-body"></div>
+        </div>
+      </div>
+      
+      <p style="font-size: 0.9rem; color: var(--accent-glow); margin-top: -1rem;">(Kattints a dobozra)</p>
+
+      <div class="hidden-content">
+        <div class="voucher">
+          <h2 style="color: var(--gold); margin: 0;">Triumph Utalvány</h2>
+          <p style="font-size: 2rem; font-weight: 800; margin: 0.5rem 0;">49.000 Ft</p>
+          <p>Beváltható velem együtt: 2026.02.02 – 02.04.</p>
+          <p style="color: var(--accent-glow); font-style: italic;">"Fejtsd ki magad, válaszd ki, mit szeretnél viselni rajtam..."</p>
         </div>
         
-        <p style="font-size: 0.9rem; opacity: 0.8; margin-top: -1.5rem; margin-bottom: 2rem;">
-          (Kattints a dobozra a kinyitáshoz)
+        <a href="#" id="replayBtn" class="cta-btn">Zene és Konfetti újra! 🎉</a>
+        
+        <p style="margin-top: 2rem; font-size: 0.8rem;">
+          Zene: Rocky (Gonna Fly Now). <a href="https://www.youtube.com/watch?v=ioE_O7Lm0I4" target="_blank" style="color:var(--accent-glow)">Ha nem indulna el, kattints ide.</a>
         </p>
-
-        <div class="voucher-container">
-          <div class="voucher">
-            <h2>Triumph Utalvány</h2>
-            <span class="amount">49.000 Ft</span>
-            <div class="details">
-              <strong>Beváltható velem együtt:</strong><br>
-              Polgár, 2026.02.02 – 2026.02.04.
-              <br><br>
-              <i>"Fejtsd ki magad, válaszd ki, mit szeretnél viselni rajtam… A meglepetés csak most kezdődik."</i>
-            </div>
-          </div>
-
-          <a href="#" class="cta-button" id="replayBtn">Zene újraindítása 🎵</a>
-        </div>
-
-        <div class="yt-fallback">
-          Zene: Rocky - Gonna Fly Now<br>
-          <a href="https://www.youtube.com/watch?v=ioE_O7Lm0I4" target="_blank">Ha nem indulna el, kattints ide</a>
-        </div>
-
       </div>
-      <footer style="margin-top: 2rem; font-size: 0.8rem; opacity: 0.5;">
-        © 2026 — Csak Neked.
-      </footer>
+
     </div>
   </div>
 
-  <div id="player-container">
-    <div id="player"></div>
-  </div>
+  <div id="player-container"><div id="player"></div></div>
 
   <script>
-    // YouTube API Logic
-    let player;
-    let isPlayerReady = false;
-    const VIDEO_ID = 'ioE_O7Lm0I4';
-
-    // 1. YouTube API betöltése aszinkron módon
-    var tag = document.createElement('script');
-    tag.src = "https://www.youtube.com/iframe_api";
-    var firstScriptTag = document.getElementsByTagName('script')[0];
-    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
-    // 2. Amikor a YouTube API készen áll
+    // --- YouTube API ---
+    let player; var isPlayerReady = false; const VIDEO_ID = 'ioE_O7Lm0I4';
+    var tag = document.createElement('script'); tag.src = "https://www.youtube.com/iframe_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0]; firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
     function onYouTubeIframeAPIReady() {
-      player = new YT.Player('player', {
-        height: '200',
-        width: '200',
-        videoId: VIDEO_ID,
-        playerVars: {
-          'playsinline': 1,
-          'controls': 0,
-          'disablekb': 1
-        },
-        events: {
-          'onReady': onPlayerReady
-        }
-      });
+      player = new YT.Player('player', { height:'200', width:'200', videoId: VIDEO_ID, playerVars:{'playsinline':1,'controls':0}, events:{'onReady': ()=>{isPlayerReady=true; player.setVolume(100);}} });
     }
 
-    function onPlayerReady(event) {
-      isPlayerReady = true;
-      // Mobilon itt nem indíthatjuk el automatikusan, csak kattintásra
-      player.setVolume(100);
-    }
-
-    // --- INTERAKCIÓ ---
-    const giftBox = document.getElementById('giftBox');
-    const boxElement = giftBox.querySelector('.box');
+    // --- Interakció ---
+    const theBox = document.getElementById('theBox');
     const replayBtn = document.getElementById('replayBtn');
 
-    // Doboz nyitása funkció
-    function openGift() {
-      // 1. Vizuális nyitás
-      if (boxElement.classList.contains('is-open')) {
-        // Ha már nyitva van, csak konfetti és zene újra
-        fireConfetti();
-        playMusic();
-        return;
-      }
+    function triggerSurprise() {
+      // 1. Doboz nyitása (CSS osztály hozzáadása)
+      theBox.classList.add('is-open');
+      
+      // 2. Konfetti
+      confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 }, colors: ['#d94a8f', '#e0c097', '#ffffff'] });
 
-      boxElement.classList.add('is-open');
-
-      // 2. Konfetti robbantás!
-      fireConfetti();
-
-      // 3. Zene indítása
-      playMusic();
-    }
-
-    function playMusic() {
-      if (isPlayerReady && player) {
-        try {
-          player.seekTo(0);
-          player.playVideo();
-        } catch(e) {
-          console.log("Zene hiba:", e);
-        }
-      } else {
-        // Ha a YouTube API lassú, megpróbáljuk 1 mp múlva újra
-        setTimeout(() => {
-          if(isPlayerReady && player) player.playVideo();
-        }, 1000);
+      // 3. Zene indítása (biztonságosan)
+      if(isPlayerReady && player) { 
+        try { player.seekTo(0); player.playVideo(); } catch(e){} 
       }
     }
 
-    function fireConfetti() {
-      var duration = 3 * 1000;
-      var animationEnd = Date.now() + duration;
-      var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 999 };
-
-      function randomInOut(min, max) {
-        return Math.random() * (max - min) + min;
-      }
-
-      var interval = setInterval(function() {
-        var timeLeft = animationEnd - Date.now();
-
-        if (timeLeft <= 0) {
-          return clearInterval(interval);
-        }
-
-        var particleCount = 50 * (timeLeft / duration);
-        // Két oldalról lőjük a konfettit
-        confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.1, 0.3), y: Math.random() - 0.2 } }));
-        confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.7, 0.9), y: Math.random() - 0.2 } }));
-      }, 250);
-    }
-
-    // Eseményfigyelők
-    giftBox.addEventListener('click', openGift);
-    replayBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      fireConfetti();
-      playMusic();
-    });
-
+    theBox.addEventListener('click', triggerSurprise);
+    replayBtn.addEventListener('click', (e)=>{ e.preventDefault(); triggerSurprise(); });
   </script>
 </body>
 </html>
